@@ -10,7 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Blog.Controllers
 {
     [ApiController]
-    public class CategoryController: ControllerBase
+    public class CategoryController : ControllerBase
     {
         [HttpGet("v1/categories")]
         public async Task<IActionResult> GetAsync(
@@ -25,14 +25,14 @@ namespace Blog.Controllers
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
                     return GetCategories(context);
                 });
-                
+
 
 
                 return Ok(new ResultVM<List<Category>>(categories));
             }
-            catch 
+            catch (Exception ex)
             {
-                return StatusCode(500, new ResultVM<List<Category>>("05x06  - Falha interna no Servidor")); 
+                return StatusCode(500, new ResultVM<List<Category>>("05x06  - Falha interna no Servidor \n" + ex.Message + "\n" + ex.ToString));
             }
         }
 
@@ -57,13 +57,13 @@ namespace Blog.Controllers
 
                 return Ok(new ResultVM<Category>(category));
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 return StatusCode(500, new ResultVM<Category>("05x07  - Não foi possivel incluir categoria"));
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                return StatusCode(500, new ResultVM<Category>( "05x08  - Falha interna no Servidor"));
+                return StatusCode(500, new ResultVM<Category>("05x08  - Falha interna no Servidor"));
             }
         }
 
@@ -77,25 +77,25 @@ namespace Blog.Controllers
 
             try
             {
-                var category = new Category 
-                { 
-                    Id=0, 
-                    Name=model.Name,
-                    Slug=model.Slug.ToLower()
+                var category = new Category
+                {
+                    Id = 0,
+                    Name = model.Name,
+                    Slug = model.Slug.ToLower()
                 };
                 await context.Categories.AddAsync(category);
                 await context.SaveChangesAsync();
 
                 return Created($"v1/categories/{category.Id}", new ResultVM<Category>(category));
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 return StatusCode(500, new ResultVM<Category>("05x09  - Não foi possivel incluir categoria"));
             }
-                
-            catch 
+
+            catch (Exception ex)
             {
-                return StatusCode(500, new ResultVM<Category>("05x10  - Falha interna no Servidor"));
+                return StatusCode(500, new ResultVM<Category>("05x10  - Falha interna no Servidor\n" + ex.Message + "\n" + ex.ToString));
             }
 
 
@@ -126,7 +126,7 @@ namespace Blog.Controllers
                 return StatusCode(500, new ResultVM<Category>("05x12  - Não foi possivel incluir categoria"));
             }
 
-            catch 
+            catch
             {
                 return StatusCode(500, new ResultVM<Category>("05x13  - Falha interna no Servidor"));
             }
@@ -154,7 +154,7 @@ namespace Blog.Controllers
                 return StatusCode(500, new ResultVM<Category>("05x14  - Não foi possivel incluir categoria"));
             }
 
-            catch 
+            catch
             {
                 return StatusCode(500, new ResultVM<Category>("05x15  - Falha interna no Servidor"));
             }
